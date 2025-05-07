@@ -14,8 +14,8 @@ namespace PreSchool.Database.Models
 
         public string Name { get; set; }
         public string Designation { get; set; }
-        public string ?Image { get; set; }
+        public string? Image { get; set; }
         [NotMapped]
-        public IFormFile File { get; set; }
+        public IFormFile? File { get; set; }
     }
 }

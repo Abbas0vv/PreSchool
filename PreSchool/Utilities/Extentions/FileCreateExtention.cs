@@ -7,7 +7,7 @@ public static class FileCreateExtention
 
         string filename = Guid.NewGuid().ToString() + file.FileName;
         string path = Path.Combine(webRoot, folderName, filename);
-        using (FileStream stream = new FileStream(path, FileMode.Create))
+        using (var stream = new FileStream(path, FileMode.Create))
         {
             file.CopyTo(stream);
         }

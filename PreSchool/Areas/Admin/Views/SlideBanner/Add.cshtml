@@ -23,21 +23,21 @@
                     <!-- Title -->
                     <div class="mb-3">
                         <label for="Name" class="form-label text-success fw-bold">Name</label>
-                        <input type="text" name="Name" class="form-control rounded-3" placeholder="Enter banner name"/>
+                        <input type="text" asp-for="Name" class="form-control rounded-3" placeholder="Enter banner name"/>
                         <span asp-validation-for="Name" class="text-danger"></span>
                     </div>
 
                     <!-- Description -->
                     <div class="mb-3">
                         <label for="Designation" class="form-label text-success fw-bold">Designation</label>
-                        <input type="text" name="Designation" class="form-control rounded-3" placeholder="Enter banner Designation"/>
+                        <input type="text" asp-for="Designation" class="form-control rounded-3" placeholder="Enter banner Designation"/>
                         <span asp-validation-for="Designation" class="text-danger"></span>
                     </div>
 
                     <!-- Offer -->
                     <div class="mb-3">
                         <label for="File" class="form-label text-success fw-bold">Image File</label>
-                        <input type="file" name="File" class="form-control rounded-3" placeholder="Enter banner offer"/>
+                        <input type="file" asp-for="File" class="form-control rounded-3" placeholder="Enter banner offer"/>
                         <span asp-validation-for="File" class="text-danger"></span>
                     </div>
 

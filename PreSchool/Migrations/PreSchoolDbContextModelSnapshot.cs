@@ -42,7 +42,7 @@ namespace PreSchool.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("SlideBanners");
+                    b.ToTable("SlideBanners", (string)null);
                 });
 #pragma warning restore 612, 618
         }

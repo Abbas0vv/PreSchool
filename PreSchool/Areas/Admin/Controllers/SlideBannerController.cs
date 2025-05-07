@@ -18,6 +18,7 @@ namespace PreSchool.Areas.Admin.Controllers
 
         }
 
+        #region Index
         [HttpGet]
         public IActionResult Index()
         {
@@ -25,7 +26,9 @@ namespace PreSchool.Areas.Admin.Controllers
             var result = View(slideBanners);
             return result;
         }
+        #endregion
 
+        #region Create
         [HttpGet]
         public IActionResult Add()
         {
@@ -33,28 +36,29 @@ namespace PreSchool.Areas.Admin.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Add(string name, string designation, IFormFile file)
+        public async Task<IActionResult> Add(SlideBanner banner)
         {
-            if (!ModelState.IsValid) return View();
+            if (!ModelState.IsValid) return View(banner);
 
-            SlideBanner slideBanner = new SlideBanner(name, designation, file);
-            if (!slideBanner.File.ContentType.Contains("image"))
+            if (!banner.File.ContentType.Contains("image"))
             {
                 ModelState.AddModelError("File", "Invalid Image Format");
                 return View();
             }
-            if (slideBanner.File.Length > 200000)
+            if (banner.File.Length > 200000)
             {
                 ModelState.AddModelError("File", "File cannot be larger than 2mb");
                 return View();
             }
 
-            slideBanner.Image = slideBanner.File.CreateFile(_webHostEnviroment.WebRootPath,"Upload/Slider");
+            banner.Image = banner.File.CreateFile(_webHostEnviroment.WebRootPath,"Upload/Slider");
 
-            await _slideBannerRepository.Insert(slideBanner);
+            await _slideBannerRepository.Insert(banner);
             return RedirectToAction(nameof(Index));
         }
+        #endregion
 
+        #region Update
         [HttpGet]
         public IActionResult Update(int id)
         {
@@ -66,23 +70,23 @@ namespace PreSchool.Areas.Admin.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Update(int id, string name, string designation, IFormFile file)
+        public async Task<IActionResult> Update(SlideBanner banner)
         {
-            if (!ModelState.IsValid) return View();
+            if (!ModelState.IsValid) return View(banner);
 
-            var slideBanner = _slideBannerRepository.GetById(id);
+            var slideBanner = _slideBannerRepository.GetById(banner.Id);
             if (slideBanner is null) return RedirectToAction(nameof(NotFound));
 
-            slideBanner.Name = name;
-            slideBanner.Designation = designation;
-            if (file is not null)
+            slideBanner.Name = banner.Name;
+            slideBanner.Designation = banner.Designation;
+            if (banner.File is not null)
             {
-                if (!file.ContentType.Contains("image"))
+                if (!banner.File.ContentType.Contains("image"))
                 {
                     ModelState.AddModelError("File", "Invalid Image Format");
                     return View();
                 }
-                if (file.Length > 200000)
+                if (banner.File.Length > 200000)
                 {
                     ModelState.AddModelError("File", "File cannot be larger than 2mb");
                     return View();
@@ -90,13 +94,16 @@ namespace PreSchool.Areas.Admin.Controllers
                 string oldFilePath = Path.Combine(_webHostEnviroment.WebRootPath, slideBanner.Image ?? "");
                 if (System.IO.File.Exists(oldFilePath)) System.IO.File.Delete(oldFilePath);
 
-                var newPath = file.CreateFile(_webHostEnviroment.WebRootPath, "Upload/Slider");
+                var newPath = banner.File.CreateFile(_webHostEnviroment.WebRootPath, "Upload/Slider");
                 slideBanner.Image = newPath;
             }
 
             _slideBannerRepository.Update(slideBanner);
             return RedirectToAction(nameof(Index));
         }
+        #endregion
+
+        #region Delete
         [HttpPost]
         public IActionResult Delete(int id)
         {
@@ -104,8 +111,12 @@ namespace PreSchool.Areas.Admin.Controllers
 
             if (slideBanner is null) return RedirectToAction(nameof(NotFound));
 
+            string oldFilePath = Path.Combine(_webHostEnviroment.WebRootPath, slideBanner.Image ?? "");
+            if (System.IO.File.Exists(oldFilePath)) System.IO.File.Delete(oldFilePath);
             _slideBannerRepository.RemoveById(id);
+
             return RedirectToAction(nameof(Index));
         }
+        #endregion
     }
 }
