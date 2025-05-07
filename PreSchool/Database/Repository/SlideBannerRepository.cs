@@ -13,7 +13,7 @@ namespace PreSchool.Database.Repository
 
         public List<SlideBanner> GetAll()
         {
-            return _dbContext.SlideBanners.ToList();
+            return _dbContext.SlideBanners.OrderBy(x=>x.Id).ToList();
         }
 
         public async Task Insert(SlideBanner slideBanner)

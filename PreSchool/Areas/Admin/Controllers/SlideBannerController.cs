@@ -75,23 +75,20 @@ namespace PreSchool.Areas.Admin.Controllers
 
             slideBanner.Name = name;
             slideBanner.Designation = designation;
-            if (slideBanner.File is not null)
+            if (file is not null)
             {
-                if (!slideBanner.File.ContentType.Contains("image"))
+                if (!file.ContentType.Contains("image"))
                 {
                     ModelState.AddModelError("File", "Invalid Image Format");
                     return View();
                 }
-                if (slideBanner.File.Length > 200000)
+                if (file.Length > 200000)
                 {
                     ModelState.AddModelError("File", "File cannot be larger than 2mb");
                     return View();
                 }
                 string oldFilePath = Path.Combine(_webHostEnviroment.WebRootPath, slideBanner.Image ?? "");
-                if (System.IO.File.Exists(oldFilePath))
-                {
-                    System.IO.File.Delete(oldFilePath);
-                }
+                if (System.IO.File.Exists(oldFilePath)) System.IO.File.Delete(oldFilePath);
 
                 var newPath = file.CreateFile(_webHostEnviroment.WebRootPath, "Upload/Slider");
                 slideBanner.Image = newPath;
