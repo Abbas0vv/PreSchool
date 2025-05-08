@@ -10,7 +10,7 @@ namespace PreSchool.Areas.Admin.Controllers
     {
         private readonly SlideBannerRepository _slideBannerRepository;
         private readonly IWebHostEnvironment _webHostEnviroment;
-
+        private const string folderName = "Upload/Slider";
         public SlideBannerController(IWebHostEnvironment environment)
         {
             _slideBannerRepository = new SlideBannerRepository();
@@ -39,19 +39,23 @@ namespace PreSchool.Areas.Admin.Controllers
         public async Task<IActionResult> Add(SlideBanner banner)
         {
             if (!ModelState.IsValid) return View(banner);
-
+            if (banner.File is null)
+            {
+                ModelState.AddModelError("File", "Please upload an image.");
+                return View(banner);
+            }
             if (!banner.File.ContentType.Contains("image"))
             {
                 ModelState.AddModelError("File", "Invalid Image Format");
                 return View();
             }
-            if (banner.File.Length > 200000)
+            if (banner.File.Length > 2097152)
             {
                 ModelState.AddModelError("File", "File cannot be larger than 2mb");
                 return View();
             }
 
-            banner.Image = banner.File.CreateFile(_webHostEnviroment.WebRootPath,"Upload/Slider");
+            banner.ImageUrl = banner.File.CreateFile(_webHostEnviroment.WebRootPath,folderName);
 
             await _slideBannerRepository.Insert(banner);
             return RedirectToAction(nameof(Index));
@@ -62,11 +66,11 @@ namespace PreSchool.Areas.Admin.Controllers
         [HttpGet]
         public IActionResult Update(int id)
         {
-            var slieBanner = _slideBannerRepository.GetById(id);
+            var slideBanner = _slideBannerRepository.GetById(id);
 
-            if (slieBanner is null) return RedirectToAction(nameof(NotFound));
+            if (slideBanner is null) return RedirectToAction(nameof(NotFound));
 
-            return View(slieBanner);
+            return View(slideBanner);
         }
 
         [HttpPost]
@@ -86,19 +90,19 @@ namespace PreSchool.Areas.Admin.Controllers
                     ModelState.AddModelError("File", "Invalid Image Format");
                     return View();
                 }
-                if (banner.File.Length > 200000)
+                if (banner.File.Length > 2097152)
                 {
                     ModelState.AddModelError("File", "File cannot be larger than 2mb");
                     return View();
                 }
-                string oldFilePath = Path.Combine(_webHostEnviroment.WebRootPath, slideBanner.Image ?? "");
-                if (System.IO.File.Exists(oldFilePath)) System.IO.File.Delete(oldFilePath);
 
-                var newPath = banner.File.CreateFile(_webHostEnviroment.WebRootPath, "Upload/Slider");
-                slideBanner.Image = newPath;
+                FileExtention.RemoveFile(_webHostEnviroment.WebRootPath, folderName, slideBanner.ImageUrl);
+
+                var newImageUrl = banner.File.CreateFile(_webHostEnviroment.WebRootPath, folderName);
+                slideBanner.ImageUrl = newImageUrl;
             }
 
-            _slideBannerRepository.Update(slideBanner);
+            await _slideBannerRepository.Update(slideBanner);
             return RedirectToAction(nameof(Index));
         }
         #endregion
@@ -111,7 +115,7 @@ namespace PreSchool.Areas.Admin.Controllers
 
             if (slideBanner is null) return RedirectToAction(nameof(NotFound));
 
-            string oldFilePath = Path.Combine(_webHostEnviroment.WebRootPath, slideBanner.Image ?? "");
+            string oldFilePath = Path.Combine(_webHostEnviroment.WebRootPath, slideBanner.ImageUrl ?? "");
             if (System.IO.File.Exists(oldFilePath)) System.IO.File.Delete(oldFilePath);
             _slideBannerRepository.RemoveById(id);
 

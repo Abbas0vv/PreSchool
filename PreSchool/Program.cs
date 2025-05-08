@@ -1,3 +1,5 @@
+using PreSchool.Database.Repository;
+
 namespace PreSchool
 {
     public class Program

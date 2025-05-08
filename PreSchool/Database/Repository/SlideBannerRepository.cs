@@ -5,7 +5,7 @@ namespace PreSchool.Database.Repository
     public class SlideBannerRepository
     {
         private PreSchoolDbContext _dbContext;
-        
+
         public SlideBannerRepository()
         {
             _dbContext = new PreSchoolDbContext();
@@ -13,7 +13,7 @@ namespace PreSchool.Database.Repository
 
         public List<SlideBanner> GetAll()
         {
-            return _dbContext.SlideBanners.OrderBy(x=>x.Id).ToList();
+            return _dbContext.SlideBanners.OrderBy(x => x.Id).ToList();
         }
 
         public async Task Insert(SlideBanner slideBanner)
@@ -41,10 +41,10 @@ namespace PreSchool.Database.Repository
             }
         }
 
-        public void Update(SlideBanner product)
+        public async Task Update(SlideBanner product)
         {
             _dbContext.SlideBanners.Update(product);
-            _dbContext.SaveChanges();
+            await _dbContext.SaveChangesAsync();
         }
     }
 }
